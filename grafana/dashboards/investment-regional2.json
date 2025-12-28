@@ -1,0 +1,772 @@
+{
+    "annotations": {
+        "list": []
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": null,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "gridPos": {
+                "h": 2,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 100,
+            "options": {
+                "code": {
+                    "language": "plaintext",
+                    "showLineNumbers": false,
+                    "showMiniMap": false
+                },
+                "content": "<div style=\"text-align: center; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); padding: 15px; border-radius: 8px;\">\n  <h1 style=\"color: white; margin: 0; font-size: 24px; font-weight: bold;\">🚢 INVESTMENT DASHBOARD REGIONAL 2</h1>\n  <h2 style=\"color: #87ceeb; margin: 5px 0 0 0; font-size: 18px;\">RKAP TAHUN 2025</h2>\n</div>",
+                "mode": "html"
+            },
+            "pluginVersion": "10.2.3",
+            "title": "",
+            "transparent": true,
+            "type": "text"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        }
+                    },
+                    "mappings": [],
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 0,
+                "y": 2
+            },
+            "id": 1,
+            "options": {
+                "displayLabels": [
+                    "percent"
+                ],
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "showLegend": true,
+                    "values": [
+                        "percent"
+                    ]
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT \n  'Realisasi' as metric,\n  ROUND((COALESCE(SUM(realisasi_januari + realisasi_februari + realisasi_maret + realisasi_april + realisasi_mei + realisasi_juni + realisasi_juli + realisasi_agustus + realisasi_september + realisasi_oktober), 0) / NULLIF(SUM(rkap), 1)) * 100, 2) as value\nFROM project_invest \nWHERE tahun_rkap = 2025\nUNION ALL\nSELECT \n  'Sisa RKAP' as metric,\n  100 - ROUND((COALESCE(SUM(realisasi_januari + realisasi_februari + realisasi_maret + realisasi_april + realisasi_mei + realisasi_juni + realisasi_juli + realisasi_agustus + realisasi_september + realisasi_oktober), 0) / NULLIF(SUM(rkap), 1)) * 100, 2) as value\nFROM project_invest \nWHERE tahun_rkap = 2025",
+                    "refId": "A"
+                }
+            ],
+            "title": "REGIONAL 2 - Capaian RKAP",
+            "type": "piechart"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "blue",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "currencyIDR"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 10
+            },
+            "id": 2,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT COALESCE(SUM(rkap), 0) as \"RKAP 2025-Trf Ang\" FROM project_invest WHERE tahun_rkap = 2025",
+                    "refId": "A"
+                }
+            ],
+            "title": "RKAP 2025 Transfer Anggaran",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "currencyIDR"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 14
+            },
+            "id": 3,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT COALESCE(SUM(realisasi_januari + realisasi_februari + realisasi_maret + realisasi_april + realisasi_mei + realisasi_juni + realisasi_juli + realisasi_agustus + realisasi_september + realisasi_oktober), 0) as \"Realisasi s.d Okt 2025\" FROM project_invest WHERE tahun_rkap = 2025",
+                    "refId": "A"
+                }
+            ],
+            "title": "Realisasi s.d Okt 2025",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "purple",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 0,
+                "y": 18
+            },
+            "id": 4,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT COUNT(*) as \"Total Item\" FROM project_invest",
+                    "refId": "A"
+                }
+            ],
+            "title": "STATUS PROGRAM - Total Item",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "fillOpacity": 80,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineWidth": 1,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 6,
+                "x": 0,
+                "y": 21
+            },
+            "id": 5,
+            "options": {
+                "barRadius": 0,
+                "barWidth": 0.6,
+                "fullHighlight": false,
+                "groupWidth": 0.7,
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": false
+                },
+                "orientation": "horizontal",
+                "showValue": "always",
+                "stacking": "none",
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 0
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT status_investasi as \"Status\", COUNT(*) as \"Jumlah\"\nFROM project_invest\nWHERE status_investasi IS NOT NULL\nGROUP BY status_investasi\nORDER BY COUNT(*) DESC",
+                    "refId": "A"
+                }
+            ],
+            "title": "Status Program Breakdown",
+            "type": "barchart"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "NO"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 50
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "NAMA AKTIVA"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 200
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byRegexp",
+                            "options": "/(KEBUTUHAN|RKAP|REALISASI|TAKSASI|CAPAIAN)/"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "currencyIDR"
+                            },
+                            {
+                                "id": "decimals",
+                                "value": 2
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "CAPAIAN %"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "percent"
+                            },
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "mode": "gradient",
+                                    "type": "gauge"
+                                }
+                            },
+                            {
+                                "id": "min",
+                                "value": 0
+                            },
+                            {
+                                "id": "max",
+                                "value": 100
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 14,
+                "w": 18,
+                "x": 6,
+                "y": 2
+            },
+            "id": 10,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "enablePagination": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": true
+                },
+                "showHeader": true,
+                "sortBy": [
+                    {
+                        "desc": false,
+                        "displayName": "NO"
+                    }
+                ]
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT \n  ROW_NUMBER() OVER (ORDER BY asset_categories) as \"NO\",\n  COALESCE(asset_categories, 'Lainnya') as \"NAMA AKTIVA\",\n  SUM(kebutuhan_dana) as \"KEBUTUHAN DANA\",\n  SUM(rkap) as \"RKAP AWAL\",\n  SUM(rkap_oktober) as \"RKAP OKT\",\n  SUM(realisasi_oktober) as \"REAL OKT\",\n  SUM(realisasi_januari + realisasi_februari + realisasi_maret + realisasi_april + realisasi_mei + realisasi_juni + realisasi_juli + realisasi_agustus + realisasi_september + realisasi_oktober) as \"REAL s.d OKT\",\n  SUM(nilai_kontrak) as \"TAKSASI RKAP\",\n  ROUND((SUM(realisasi_januari + realisasi_februari + realisasi_maret + realisasi_april + realisasi_mei + realisasi_juni + realisasi_juli + realisasi_agustus + realisasi_september + realisasi_oktober) / NULLIF(SUM(rkap), 0)) * 100, 2) as \"CAPAIAN %\"\nFROM project_invest\nWHERE tahun_rkap = 2025\nGROUP BY asset_categories\nORDER BY asset_categories",
+                    "refId": "A"
+                }
+            ],
+            "title": "Rekapitulasi Investasi per Kategori Aktiva",
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        }
+                    },
+                    "mappings": []
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 9,
+                "x": 6,
+                "y": 16
+            },
+            "id": 11,
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "right",
+                    "showLegend": true,
+                    "values": [
+                        "value",
+                        "percent"
+                    ]
+                },
+                "pieType": "pie",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT type_investasi as \"Type Investasi\", COUNT(*) as \"Jumlah\"\nFROM project_invest\nWHERE type_investasi IS NOT NULL\nGROUP BY type_investasi\nORDER BY COUNT(*) DESC",
+                    "refId": "A"
+                }
+            ],
+            "title": "Distribusi Type Investasi",
+            "type": "piechart"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        }
+                    },
+                    "mappings": []
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 9,
+                "x": 15,
+                "y": 16
+            },
+            "id": 12,
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "right",
+                    "showLegend": true,
+                    "values": [
+                        "value",
+                        "percent"
+                    ]
+                },
+                "pieType": "pie",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT status_issue as \"Status Issue\", COUNT(*) as \"Jumlah\"\nFROM project_invest\nWHERE status_issue IS NOT NULL\nGROUP BY status_issue",
+                    "refId": "A"
+                }
+            ],
+            "title": "Distribusi Status Issue",
+            "type": "piechart"
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "postgres"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "RKAP"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "currencyIDR"
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Nilai Kontrak"
+                        },
+                        "properties": [
+                            {
+                                "id": "unit",
+                                "value": "currencyIDR"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 18,
+                "x": 6,
+                "y": 22
+            },
+            "id": 13,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": true
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "postgres"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT \n  id_investasi as \"ID Investasi\",\n  SUBSTRING(project_definition, 1, 50) as \"Project\",\n  entitas_terminal as \"Terminal\",\n  type_investasi as \"Type\",\n  rkap as \"RKAP\",\n  nilai_kontrak as \"Nilai Kontrak\",\n  status_issue as \"Status\"\nFROM project_invest\nWHERE tahun_rkap = 2025\nORDER BY rkap DESC\nLIMIT 10",
+                    "refId": "A"
+                }
+            ],
+            "title": "Top 10 Projects by RKAP",
+            "type": "table"
+        }
+    ],
+    "refresh": "30s",
+    "schemaVersion": 39,
+    "tags": [
+        "investment",
+        "regional2",
+        "rkap"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-1y",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Investment Dashboard Regional 2 - RKAP 2025",
+    "uid": "investment-regional2",
+    "version": 1,
+    "weekStart": ""
+}
