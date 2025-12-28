@@ -63,13 +63,13 @@ class ProjectInvest(Base):
     """
     __tablename__ = "project_invest"
 
-    # Primary identification (using custom GUID for cross-database compatibility)
-    id_root = Column(GUID(36), primary_key=True, default=uuid.uuid4)
+    # Primary identification (custom project ID format like 'P/19.02.022-001')
+    id_root = Column(String(100), primary_key=True)
     
     # Regional & Entity info
     klaster_regional = Column(String(100), default="Regional 2")
     entitas_terminal = Column(String(255))
-    id_investasi = Column(String(100), unique=True)
+    id_investasi = Column(String(100))
     
     # Categorization
     asset_categories = Column(String(255))

@@ -10,13 +10,13 @@ CREATE TYPE status_issue_enum AS ENUM ('Open', 'Closed');
 
 -- Main project investment table
 CREATE TABLE project_invest (
-    -- Primary identification
-    id_root UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    -- Primary identification (custom project ID format)
+    id_root VARCHAR(100) PRIMARY KEY,
     
     -- Regional & Entity info
     klaster_regional VARCHAR(100) DEFAULT 'Regional 2',
     entitas_terminal VARCHAR(255),
-    id_investasi VARCHAR(100) UNIQUE,
+    id_investasi VARCHAR(100),
     
     -- Categorization
     asset_categories VARCHAR(255),
@@ -125,6 +125,7 @@ CREATE TRIGGER update_project_invest_updated_at
 
 -- Insert sample data for testing
 INSERT INTO project_invest (
+    id_root,
     id_investasi,
     entitas_terminal,
     project_definition,
@@ -138,6 +139,7 @@ INSERT INTO project_invest (
     nilai_kontrak
 ) VALUES 
 (
+    'P/25.01.001-001',
     'INV-2025-001',
     'Terminal Pelabuhan Jakarta',
     'Pengembangan Dermaga Baru untuk Kapal Kontainer',
@@ -151,6 +153,7 @@ INSERT INTO project_invest (
     48000000000.00
 ),
 (
+    'P/25.01.002-001',
     'INV-2025-002',
     'Terminal Pelabuhan Surabaya',
     'Modernisasi Sistem IT Terminal',
@@ -164,6 +167,7 @@ INSERT INTO project_invest (
     14500000000.00
 ),
 (
+    'P/25.01.003-001',
     'INV-2025-003',
     'Terminal Pelabuhan Makassar',
     'Pengadaan Alat Bongkar Muat',

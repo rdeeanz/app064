@@ -5,7 +5,6 @@ Provides type safety and automatic documentation for API endpoints.
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
-from uuid import UUID
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -113,6 +112,7 @@ class ProjectBase(BaseModel):
 
 class ProjectCreate(ProjectBase):
     """Schema for creating a new project."""
+    id_root: str = Field(..., max_length=100, description="Primary project ID (e.g., 'P/19.02.022-001')")
     id_investasi: str = Field(..., max_length=100, description="Unique investment ID")
     project_definition: str = Field(..., description="Project definition/description")
 
@@ -153,7 +153,7 @@ class ProjectIssueUpdate(BaseModel):
 
 class ProjectResponse(ProjectBase):
     """Schema for project response with all fields."""
-    id_root: UUID
+    id_root: str
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
