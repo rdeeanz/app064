@@ -252,12 +252,12 @@ export default function ProjectList() {
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-1">
-                                                    <Link to={`/projects/${project.id_root}`}>
+                                                    <Link to={`/projects/${encodeURIComponent(project.id_root)}`}>
                                                         <Button variant="ghost" size="icon">
                                                             <Eye className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
-                                                    <Link to={`/projects/${project.id_root}/edit`}>
+                                                    <Link to={`/edit/${encodeURIComponent(project.id_root)}`}>
                                                         <Button variant="ghost" size="icon">
                                                             <Edit className="h-4 w-4" />
                                                         </Button>

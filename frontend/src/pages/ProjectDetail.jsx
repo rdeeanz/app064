@@ -158,7 +158,7 @@ export default function ProjectDetail() {
                         </div>
                     </div>
                 </div>
-                <Link to={`/projects/${id}/edit`}>
+                <Link to={`/edit/${encodeURIComponent(id)}`}>
                     <Button>
                         <Edit className="h-4 w-4 mr-2" />
                         Edit

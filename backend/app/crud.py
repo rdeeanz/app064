@@ -3,7 +3,6 @@ CRUD operations for project investment data.
 Provides database operations with proper error handling.
 """
 from typing import Optional
-from uuid import UUID
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -55,7 +54,7 @@ def get_projects(
     return projects, total
 
 
-def get_project(db: Session, id_root: UUID) -> Optional[models.ProjectInvest]:
+def get_project(db: Session, id_root: str) -> Optional[models.ProjectInvest]:
     """
     Get a single project by its ID.
     
@@ -107,7 +106,7 @@ def create_project(db: Session, project: schemas.ProjectCreate) -> models.Projec
 
 def update_project(
     db: Session,
-    id_root: UUID,
+    id_root: str,
     project: schemas.ProjectUpdate
 ) -> Optional[models.ProjectInvest]:
     """
@@ -137,7 +136,7 @@ def update_project(
 
 def update_project_progress(
     db: Session,
-    id_root: UUID,
+    id_root: str,
     progress: schemas.ProjectProgressUpdate
 ) -> Optional[models.ProjectInvest]:
     """
@@ -166,7 +165,7 @@ def update_project_progress(
 
 def update_project_issue(
     db: Session,
-    id_root: UUID,
+    id_root: str,
     issue: schemas.ProjectIssueUpdate
 ) -> Optional[models.ProjectInvest]:
     """
@@ -193,7 +192,7 @@ def update_project_issue(
     return db_project
 
 
-def delete_project(db: Session, id_root: UUID) -> bool:
+def delete_project(db: Session, id_root: str) -> bool:
     """
     Delete a project by ID.
     

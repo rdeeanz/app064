@@ -3,8 +3,6 @@ API endpoints for project investment management.
 Provides RESTful CRUD operations for projects.
 """
 from typing import Optional
-from uuid import UUID
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -63,9 +61,9 @@ def get_statistics(
     return crud.get_summary_stats(db, tahun_rkap)
 
 
-@router.get("/{id_root}", response_model=schemas.ProjectResponse)
+@router.get("/{id_root:path}", response_model=schemas.ProjectResponse)
 def get_project(
-    id_root: UUID,
+    id_root: str,
     db: Session = Depends(get_db)
 ):
     """
@@ -102,9 +100,9 @@ def create_project(
     return crud.create_project(db, project)
 
 
-@router.put("/{id_root}", response_model=schemas.ProjectResponse)
+@router.put("/{id_root:path}", response_model=schemas.ProjectResponse)
 def update_project(
-    id_root: UUID,
+    id_root: str,
     project: schemas.ProjectUpdate,
     db: Session = Depends(get_db)
 ):
@@ -119,9 +117,9 @@ def update_project(
     return updated
 
 
-@router.patch("/{id_root}/progress", response_model=schemas.ProjectResponse)
+@router.patch("/{id_root:path}/progress", response_model=schemas.ProjectResponse)
 def update_project_progress(
-    id_root: UUID,
+    id_root: str,
     progress: schemas.ProjectProgressUpdate,
     db: Session = Depends(get_db)
 ):
@@ -141,9 +139,9 @@ def update_project_progress(
     return updated
 
 
-@router.patch("/{id_root}/issue", response_model=schemas.ProjectResponse)
+@router.patch("/{id_root:path}/issue", response_model=schemas.ProjectResponse)
 def update_project_issue(
-    id_root: UUID,
+    id_root: str,
     issue: schemas.ProjectIssueUpdate,
     db: Session = Depends(get_db)
 ):
@@ -165,9 +163,9 @@ def update_project_issue(
     return updated
 
 
-@router.delete("/{id_root}", status_code=204)
+@router.delete("/{id_root:path}", status_code=204)
 def delete_project(
-    id_root: UUID,
+    id_root: str,
     db: Session = Depends(get_db)
 ):
     """

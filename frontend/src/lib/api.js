@@ -61,7 +61,7 @@ export const projectAPI = {
      * Get single project by ID
      */
     async getProject(idRoot) {
-        return fetchAPI(`/projects/${idRoot}`)
+        return fetchAPI(`/projects/${encodeURIComponent(idRoot)}`)
     },
 
     /**
@@ -78,7 +78,7 @@ export const projectAPI = {
      * Update project (full update)
      */
     async updateProject(idRoot, data) {
-        return fetchAPI(`/projects/${idRoot}`, {
+        return fetchAPI(`/projects/${encodeURIComponent(idRoot)}`, {
             method: 'PUT',
             body: JSON.stringify(data),
         })
@@ -88,7 +88,7 @@ export const projectAPI = {
      * Update project progress
      */
     async updateProgress(idRoot, data) {
-        return fetchAPI(`/projects/${idRoot}/progress`, {
+        return fetchAPI(`/projects/${encodeURIComponent(idRoot)}/progress`, {
             method: 'PATCH',
             body: JSON.stringify(data),
         })
@@ -98,7 +98,7 @@ export const projectAPI = {
      * Update project issue
      */
     async updateIssue(idRoot, data) {
-        return fetchAPI(`/projects/${idRoot}/issue`, {
+        return fetchAPI(`/projects/${encodeURIComponent(idRoot)}/issue`, {
             method: 'PATCH',
             body: JSON.stringify(data),
         })
@@ -108,7 +108,7 @@ export const projectAPI = {
      * Delete project
      */
     async deleteProject(idRoot) {
-        return fetchAPI(`/projects/${idRoot}`, {
+        return fetchAPI(`/projects/${encodeURIComponent(idRoot)}`, {
             method: 'DELETE',
         })
     },
