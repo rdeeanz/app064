@@ -153,3 +153,6 @@ class ProjectInvest(Base):
     # Timestamps
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+
