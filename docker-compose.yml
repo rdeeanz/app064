@@ -47,6 +47,18 @@ services:
       - project_network
     restart: unless-stopped
 
+  # React Frontend V2 (Shadcn/UI)
+  frontend-v2:
+    build: ./frontend-v2
+    container_name: project_invest_frontend_v2
+    ports:
+      - "3002:80"
+    depends_on:
+      - backend
+    networks:
+      - project_network
+    restart: unless-stopped
+
   # Grafana Dashboard
   grafana:
     image: grafana/grafana:10.2.3

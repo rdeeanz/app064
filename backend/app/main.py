@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import projects
+from .routers import projects, auth, monitor
 from .database import engine, Base, SQLITE_FALLBACK_URL
 from .models import ProjectInvest, TypeInvestasi, StatusIssue
 
@@ -117,6 +117,8 @@ app.add_middleware(
 
 # Include routers
 app.include_router(projects.router)
+app.include_router(auth.router)
+app.include_router(monitor.router)
 
 
 @app.get("/health")
