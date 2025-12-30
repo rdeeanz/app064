@@ -75,6 +75,18 @@ def seed_sample_data():
             db.add_all(sample_projects)
             db.commit()
             print(f"Seeded {len(sample_projects)} sample projects")
+        
+        # Seed Super Admin if not exists
+        from .models import User
+        if db.query(User).filter(User.username == "superadmin").first() is None:
+            superadmin = User(
+                username="superadmin",
+                password_hash="$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW", # password123
+                role="admin"
+            )
+            db.add(superadmin)
+            db.commit()
+            print("Seeded superadmin user")
     finally:
         db.close()
 
