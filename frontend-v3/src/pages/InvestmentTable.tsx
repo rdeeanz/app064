@@ -31,6 +31,8 @@ import {
     Pencil,
     GripVertical,
     Filter,
+    Eye,
+    Info,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -51,53 +53,57 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useMonitorData } from "@/hooks/useMonitorData"
 import { MonitorInvestData } from "@/lib/api"
 import { formatCurrency } from "@/lib/utils"
 
-// Get current month's realisasi field based on Jakarta timezone
-function getCurrentMonthRealisasiField(): keyof MonitorInvestData {
+// Month mapping for realisasi fields
+const MONTHS = [
+    { value: "januari", label: "Januari", field: "realisasi_januari" },
+    { value: "februari", label: "Februari", field: "realisasi_februari" },
+    { value: "maret", label: "Maret", field: "realisasi_maret" },
+    { value: "april", label: "April", field: "realisasi_april" },
+    { value: "mei", label: "Mei", field: "realisasi_mei" },
+    { value: "juni", label: "Juni", field: "realisasi_juni" },
+    { value: "juli", label: "Juli", field: "realisasi_juli" },
+    { value: "agustus", label: "Agustus", field: "realisasi_agustus" },
+    { value: "september", label: "September", field: "realisasi_september" },
+    { value: "oktober", label: "Oktober", field: "realisasi_oktober" },
+    { value: "november", label: "November", field: "realisasi_november" },
+    { value: "desember", label: "Desember", field: "realisasi_desember" },
+] as const
+
+// Get current month index based on Jakarta timezone
+function getCurrentMonthIndex(): number {
     const jakartaTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
     const jakartaDate = new Date(jakartaTime)
-    const month = jakartaDate.getMonth() // 0-11
-
-    const monthFields: (keyof MonitorInvestData)[] = [
-        "realisasi_januari",
-        "realisasi_februari",
-        "realisasi_maret",
-        "realisasi_april",
-        "realisasi_mei",
-        "realisasi_juni",
-        "realisasi_juli",
-        "realisasi_agustus",
-        "realisasi_september",
-        "realisasi_oktober",
-        "realisasi_november",
-        "realisasi_desember",
-    ]
-
-    return monthFields[month] ?? "realisasi_desember"
+    return jakartaDate.getMonth() // 0-11
 }
 
-function getCurrentMonthName(): string {
-    const jakartaTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
-    const jakartaDate = new Date(jakartaTime)
-    const month = jakartaDate.getMonth()
-
-    const monthNames = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ]
-
-    return monthNames[month] ?? "Desember"
-}
+// Column visibility options
+const COLUMN_VISIBILITY_OPTIONS = [
+    { id: "klaster_regional", label: "Klaster Regional" },
+    { id: "original_id_investasi", label: "ID Investasi" },
+    { id: "asset_categories", label: "Asset Categories" },
+    { id: "type_investasi", label: "Type Investasi" },
+    { id: "tahun_usulan", label: "Tahun Usulan" },
+    { id: "kebutuhan_dana", label: "Kebutuhan Dana" },
+    { id: "penyerapan_sd_tahun_lalu", label: "Penyerapan s.d. Tahun Lalu" },
+]
 
 export default function InvestmentTable() {
     const navigate = useNavigate()
     const { data, isLoading, error, refetch } = useMonitorData()
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
     const [globalFilter, setGlobalFilter] = useState("")
     const [columnResizeMode] = useState<ColumnResizeMode>("onChange")
     const [columnSizing, setColumnSizing] = useState({})
@@ -109,9 +115,24 @@ export default function InvestmentTable() {
     const [filterEntitas, setFilterEntitas] = useState<string>("all")
     const [filterStatus, setFilterStatus] = useState<string>("all")
     const [filterIssue, setFilterIssue] = useState<string>("all")
+    const [selectedMonth, setSelectedMonth] = useState<string>(MONTHS[getCurrentMonthIndex()]?.value ?? "desember")
 
-    const currentMonthField = useMemo(() => getCurrentMonthRealisasiField(), [])
-    const currentMonthName = useMemo(() => getCurrentMonthName(), [])
+    // Column visibility state
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+        klaster_regional: true,
+        original_id_investasi: false,
+        asset_categories: false,
+        type_investasi: false,
+        tahun_usulan: true,
+        kebutuhan_dana: true,
+        penyerapan_sd_tahun_lalu: false,
+    })
+
+    // Get selected month data
+    const selectedMonthData = useMemo(() => {
+        const monthData = MONTHS.find(m => m.value === selectedMonth)
+        return monthData ?? MONTHS[11] // Default to December
+    }, [selectedMonth])
 
     // Get unique filter options from data
     const filterOptions = useMemo(() => {
@@ -175,6 +196,7 @@ export default function InvestmentTable() {
                 maxSize: 80,
             },
             {
+                id: "klaster_regional",
                 accessorKey: "klaster_regional",
                 header: "Klaster Regional",
                 cell: ({ row }) => (
@@ -187,6 +209,54 @@ export default function InvestmentTable() {
                 size: 120,
                 minSize: 80,
                 maxSize: 200,
+                enableSorting: false,
+            },
+            {
+                id: "original_id_investasi",
+                accessorKey: "original_id_investasi",
+                header: "ID Investasi",
+                cell: ({ row }) => (
+                    <div className="min-w-[80px]">
+                        <span className="text-sm font-mono whitespace-normal break-words">
+                            {row.getValue("original_id_investasi") || "-"}
+                        </span>
+                    </div>
+                ),
+                size: 120,
+                minSize: 80,
+                maxSize: 200,
+                enableSorting: false,
+            },
+            {
+                id: "asset_categories",
+                accessorKey: "asset_categories",
+                header: "Asset Categories",
+                cell: ({ row }) => (
+                    <div className="min-w-[80px]">
+                        <span className="text-sm whitespace-normal break-words">
+                            {row.getValue("asset_categories") || "-"}
+                        </span>
+                    </div>
+                ),
+                size: 130,
+                minSize: 80,
+                maxSize: 200,
+                enableSorting: false,
+            },
+            {
+                id: "type_investasi",
+                accessorKey: "type_investasi",
+                header: "Type Investasi",
+                cell: ({ row }) => (
+                    <div className="min-w-[80px]">
+                        <Badge variant="outline" className="whitespace-normal">
+                            {row.getValue("type_investasi") || "-"}
+                        </Badge>
+                    </div>
+                ),
+                size: 120,
+                minSize: 80,
+                maxSize: 180,
                 enableSorting: false,
             },
             {
@@ -213,6 +283,7 @@ export default function InvestmentTable() {
                 maxSize: 300,
             },
             {
+                id: "tahun_usulan",
                 accessorKey: "tahun_usulan",
                 header: ({ column }) => (
                     <Button
@@ -225,7 +296,9 @@ export default function InvestmentTable() {
                     </Button>
                 ),
                 cell: ({ row }) => (
-                    <span className="text-sm font-mono">{row.getValue("tahun_usulan") || "-"}</span>
+                    <div className="text-center">
+                        <span className="text-sm font-mono">{row.getValue("tahun_usulan") || "-"}</span>
+                    </div>
                 ),
                 size: 80,
                 minSize: 60,
@@ -275,11 +348,29 @@ export default function InvestmentTable() {
                 ),
                 cell: ({ row }) => {
                     const status = row.getValue("status_investasi") as string
+                    const progresDescription = row.original.progres_description
                     return (
-                        <div className="min-w-[80px]">
+                        <div className="min-w-[80px] flex flex-col items-center text-center">
                             <Badge variant="outline" className="whitespace-normal">
                                 {status || "-"}
                             </Badge>
+                            {progresDescription && (
+                                <div className="mt-1">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors">
+                                                    <Info className="h-3.5 w-3.5" />
+                                                    <span>Info</span>
+                                                </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" className="max-w-[300px]">
+                                                <p className="text-sm whitespace-pre-line">{progresDescription}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            )}
                         </div>
                     )
                 },
@@ -299,18 +390,40 @@ export default function InvestmentTable() {
                         <ArrowUpDown className="ml-1 h-3 w-3" />
                     </Button>
                 ),
-                cell: ({ row }) => (
-                    <div className="min-w-[80px]">
-                        <span className="text-sm whitespace-normal break-words">
-                            {row.getValue("issue_categories") || "-"}
-                        </span>
-                    </div>
-                ),
+                cell: ({ row }) => {
+                    const issueCategories = row.getValue("issue_categories") as string
+                    const issueDescription = row.original.issue_description
+                    return (
+                        <div className="min-w-[80px] flex flex-col items-center text-center">
+                            <span className="text-sm whitespace-normal break-words">
+                                {issueCategories || "-"}
+                            </span>
+                            {issueDescription && (
+                                <div className="mt-1">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors">
+                                                    <Info className="h-3.5 w-3.5" />
+                                                    <span>Info</span>
+                                                </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" className="max-w-[300px]">
+                                                <p className="text-sm whitespace-pre-line">{issueDescription}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            )}
+                        </div>
+                    )
+                },
                 size: 140,
                 minSize: 100,
                 maxSize: 250,
             },
             {
+                id: "kebutuhan_dana",
                 accessorKey: "kebutuhan_dana",
                 header: ({ column }) => (
                     <Button
@@ -331,6 +444,30 @@ export default function InvestmentTable() {
                 ),
                 size: 140,
                 minSize: 100,
+                maxSize: 200,
+            },
+            {
+                id: "penyerapan_sd_tahun_lalu",
+                accessorKey: "penyerapan_sd_tahun_lalu",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="-ml-3 h-8 whitespace-nowrap"
+                    >
+                        Penyerapan s.d. Thn Lalu
+                        <ArrowUpDown className="ml-1 h-3 w-3" />
+                    </Button>
+                ),
+                cell: ({ row }) => (
+                    <div className="min-w-[100px]">
+                        <span className="text-sm font-medium whitespace-normal text-right block">
+                            {formatCurrency(row.getValue("penyerapan_sd_tahun_lalu"))}
+                        </span>
+                    </div>
+                ),
+                size: 150,
+                minSize: 120,
                 maxSize: 200,
             },
             {
@@ -357,22 +494,22 @@ export default function InvestmentTable() {
                 maxSize: 180,
             },
             {
-                id: "realisasi_bulan_ini",
-                accessorFn: (row) => row[currentMonthField],
+                id: "realisasi_bulan",
+                accessorFn: (row) => row[selectedMonthData.field as keyof MonitorInvestData],
                 header: ({ column }) => (
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                         className="-ml-3 h-8 whitespace-nowrap"
                     >
-                        Realisasi {currentMonthName}
+                        Realisasi {selectedMonthData.label}
                         <ArrowUpDown className="ml-1 h-3 w-3" />
                     </Button>
                 ),
                 cell: ({ row }) => (
                     <div className="min-w-[100px]">
                         <span className="text-sm font-medium whitespace-normal text-right block">
-                            {formatCurrency(row.original[currentMonthField] as number)}
+                            {formatCurrency(row.original[selectedMonthData.field as keyof MonitorInvestData] as number)}
                         </span>
                     </div>
                 ),
@@ -404,7 +541,7 @@ export default function InvestmentTable() {
                 maxSize: 200,
             },
         ],
-        [currentMonthField, currentMonthName]
+        [selectedMonthData]
     )
 
     const table = useReactTable({
@@ -453,6 +590,13 @@ export default function InvestmentTable() {
         setFilterStatus("all")
         setFilterIssue("all")
         setGlobalFilter("")
+    }
+
+    const toggleColumnVisibility = (columnId: string) => {
+        setColumnVisibility(prev => ({
+            ...prev,
+            [columnId]: !prev[columnId]
+        }))
     }
 
     const hasActiveFilters = filterKlaster !== "all" || filterEntitas !== "all" ||
@@ -525,7 +669,7 @@ export default function InvestmentTable() {
                             <span className="text-sm font-medium text-muted-foreground">Filter:</span>
 
                             <Select value={filterKlaster} onValueChange={setFilterKlaster}>
-                                <SelectTrigger className="w-[150px] h-8 text-xs">
+                                <SelectTrigger className="w-[140px] h-8 text-xs">
                                     <SelectValue placeholder="Klaster Regional" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -537,7 +681,7 @@ export default function InvestmentTable() {
                             </Select>
 
                             <Select value={filterEntitas} onValueChange={setFilterEntitas}>
-                                <SelectTrigger className="w-[150px] h-8 text-xs">
+                                <SelectTrigger className="w-[140px] h-8 text-xs">
                                     <SelectValue placeholder="Entitas Terminal" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -549,7 +693,7 @@ export default function InvestmentTable() {
                             </Select>
 
                             <Select value={filterStatus} onValueChange={setFilterStatus}>
-                                <SelectTrigger className="w-[150px] h-8 text-xs">
+                                <SelectTrigger className="w-[140px] h-8 text-xs">
                                     <SelectValue placeholder="Status Investasi" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -561,13 +705,26 @@ export default function InvestmentTable() {
                             </Select>
 
                             <Select value={filterIssue} onValueChange={setFilterIssue}>
-                                <SelectTrigger className="w-[150px] h-8 text-xs">
+                                <SelectTrigger className="w-[140px] h-8 text-xs">
                                     <SelectValue placeholder="Issue Categories" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Semua Issue</SelectItem>
                                     {filterOptions.issue.map((i) => (
                                         <SelectItem key={i} value={i}>{i}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                <SelectTrigger className="w-[150px] h-8 text-xs">
+                                    <SelectValue placeholder="Realisasi Bulan" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {MONTHS.map((month) => (
+                                        <SelectItem key={month.value} value={month.value}>
+                                            Realisasi {month.label}
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -583,6 +740,28 @@ export default function InvestmentTable() {
                                 </Button>
                             )}
                         </div>
+
+                        {/* Column Visibility Checkboxes */}
+                        <div className="flex flex-wrap items-center gap-3 pt-2 border-t">
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium text-muted-foreground">Tampilkan Kolom:</span>
+
+                            {COLUMN_VISIBILITY_OPTIONS.map((option) => (
+                                <div key={option.id} className="flex items-center gap-1.5">
+                                    <Checkbox
+                                        id={`col-${option.id}`}
+                                        checked={columnVisibility[option.id] !== false}
+                                        onCheckedChange={() => toggleColumnVisibility(option.id)}
+                                    />
+                                    <Label
+                                        htmlFor={`col-${option.id}`}
+                                        className="text-xs cursor-pointer"
+                                    >
+                                        {option.label}
+                                    </Label>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -593,7 +772,7 @@ export default function InvestmentTable() {
                     ) : (
                         <>
                             <div className="rounded-md border overflow-x-auto">
-                                <Table style={{ width: table.getCenterTotalSize() }}>
+                                <Table style={{ width: table.getCenterTotalSize() }} className="border-collapse">
                                     <TableHeader>
                                         {table.getHeaderGroups().map((headerGroup) => (
                                             <TableRow key={headerGroup.id}>
@@ -601,7 +780,7 @@ export default function InvestmentTable() {
                                                     <TableHead
                                                         key={header.id}
                                                         style={{ width: header.getSize() }}
-                                                        className="relative group"
+                                                        className="relative group border-x border-border/50"
                                                     >
                                                         {header.isPlaceholder
                                                             ? null
@@ -634,6 +813,7 @@ export default function InvestmentTable() {
                                                             <TableCell
                                                                 key={cell.id}
                                                                 style={{ width: cell.column.getSize() }}
+                                                                className="border-x border-border/50"
                                                             >
                                                                 {flexRender(
                                                                     cell.column.columnDef.cell,
@@ -642,34 +822,39 @@ export default function InvestmentTable() {
                                                             </TableCell>
                                                         ))}
                                                     </TableRow>
-                                                    {/* Expanded Row Content - positioned under project_definition */}
+                                                    {/* Expanded Row Content - Individual cells with buttons under project_definition */}
                                                     {row.getIsExpanded() && (
                                                         <TableRow className="bg-muted/30 hover:bg-muted/50">
-                                                            <TableCell colSpan={columns.length} className="p-0">
-                                                                <div
-                                                                    className="flex flex-col gap-2 py-3"
-                                                                    style={{ paddingLeft: "calc(60px + 120px + 150px + 80px + 24px)" }}
+                                                            {row.getVisibleCells().map((cell) => (
+                                                                <TableCell
+                                                                    key={`expand-${cell.id}`}
+                                                                    style={{ width: cell.column.getSize() }}
+                                                                    className="border-x border-border/50 py-2"
                                                                 >
-                                                                    <Button
-                                                                        variant="default"
-                                                                        size="sm"
-                                                                        onClick={() => navigate(`/dashboard/invest/${encodeURIComponent(row.original.ref_id_root)}/edit`)}
-                                                                        className="gap-2 w-fit"
-                                                                    >
-                                                                        <Pencil className="h-4 w-4" />
-                                                                        Edit Investasi
-                                                                    </Button>
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        size="sm"
-                                                                        onClick={() => navigate(`/dashboard/invest/${encodeURIComponent(row.original.original_id_investasi)}/kontrak`)}
-                                                                        className="gap-2 w-fit"
-                                                                    >
-                                                                        <FileText className="h-4 w-4" />
-                                                                        View Kontrak
-                                                                    </Button>
-                                                                </div>
-                                                            </TableCell>
+                                                                    {cell.column.id === "project_definition" ? (
+                                                                        <div className="flex flex-col gap-2 pl-6">
+                                                                            <Button
+                                                                                variant="default"
+                                                                                size="sm"
+                                                                                onClick={() => navigate(`/dashboard/invest/${encodeURIComponent(row.original.ref_id_root)}/edit`)}
+                                                                                className="gap-2 w-fit"
+                                                                            >
+                                                                                <Pencil className="h-4 w-4" />
+                                                                                Edit Investasi
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                onClick={() => navigate(`/dashboard/invest/${encodeURIComponent(row.original.original_id_investasi)}/kontrak`)}
+                                                                                className="gap-2 w-fit"
+                                                                            >
+                                                                                <FileText className="h-4 w-4" />
+                                                                                View Kontrak
+                                                                            </Button>
+                                                                        </div>
+                                                                    ) : null}
+                                                                </TableCell>
+                                                            ))}
                                                         </TableRow>
                                                     )}
                                                 </Fragment>
@@ -677,7 +862,7 @@ export default function InvestmentTable() {
                                         ) : (
                                             <TableRow>
                                                 <TableCell
-                                                    colSpan={columns.length}
+                                                    colSpan={table.getVisibleLeafColumns().length}
                                                     className="h-24 text-center"
                                                 >
                                                     No results.
