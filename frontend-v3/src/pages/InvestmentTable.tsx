@@ -95,6 +95,7 @@ const COLUMN_VISIBILITY_OPTIONS = [
     { id: "asset_categories", label: "Asset Categories" },
     { id: "type_investasi", label: "Type Investasi" },
     { id: "tahun_usulan", label: "Tahun Usulan" },
+    { id: "status_issue", label: "Status Issue" },
     { id: "kebutuhan_dana", label: "Kebutuhan Dana" },
     { id: "penyerapan_sd_tahun_lalu", label: "Penyerapan s.d. Tahun Lalu" },
 ]
@@ -115,6 +116,7 @@ export default function InvestmentTable() {
     const [filterEntitas, setFilterEntitas] = useState<string>("all")
     const [filterStatus, setFilterStatus] = useState<string>("all")
     const [filterIssue, setFilterIssue] = useState<string>("all")
+    const [filterStatusIssue, setFilterStatusIssue] = useState<string>("all")
     const [selectedMonth, setSelectedMonth] = useState<string>(MONTHS[getCurrentMonthIndex()]?.value ?? "desember")
 
     // Column visibility state
@@ -124,6 +126,7 @@ export default function InvestmentTable() {
         asset_categories: false,
         type_investasi: false,
         tahun_usulan: true,
+        status_issue: false,
         kebutuhan_dana: true,
         penyerapan_sd_tahun_lalu: false,
     })
@@ -140,12 +143,14 @@ export default function InvestmentTable() {
         const entitasSet = new Set<string>()
         const statusSet = new Set<string>()
         const issueSet = new Set<string>()
+        const statusIssueSet = new Set<string>()
 
         data.forEach((item) => {
             if (item.klaster_regional) klasterSet.add(item.klaster_regional)
             if (item.entitas_terminal) entitasSet.add(item.entitas_terminal)
             if (item.status_investasi) statusSet.add(item.status_investasi)
             if (item.issue_categories) issueSet.add(item.issue_categories)
+            if (item.status_issue) statusIssueSet.add(item.status_issue)
         })
 
         return {
@@ -153,6 +158,7 @@ export default function InvestmentTable() {
             entitas: Array.from(entitasSet).sort(),
             status: Array.from(statusSet).sort(),
             issue: Array.from(issueSet).sort(),
+            statusIssue: Array.from(statusIssueSet).sort(),
         }
     }, [data])
 
@@ -163,9 +169,10 @@ export default function InvestmentTable() {
             if (filterEntitas !== "all" && item.entitas_terminal !== filterEntitas) return false
             if (filterStatus !== "all" && item.status_investasi !== filterStatus) return false
             if (filterIssue !== "all" && item.issue_categories !== filterIssue) return false
+            if (filterStatusIssue !== "all" && item.status_issue !== filterStatusIssue) return false
             return true
         })
-    }, [data, filterKlaster, filterEntitas, filterStatus, filterIssue])
+    }, [data, filterKlaster, filterEntitas, filterStatus, filterIssue, filterStatusIssue])
 
     const columns: ColumnDef<MonitorInvestData>[] = useMemo(
         () => [
@@ -423,6 +430,29 @@ export default function InvestmentTable() {
                 maxSize: 250,
             },
             {
+                accessorKey: "status_issue",
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="-ml-3 h-8 whitespace-nowrap"
+                    >
+                        Status Issue
+                        <ArrowUpDown className="ml-1 h-3 w-3" />
+                    </Button>
+                ),
+                cell: ({ row }) => (
+                    <div className="min-w-[100px] text-center">
+                        <span className="text-sm whitespace-normal break-words">
+                            {row.getValue("status_issue") || "-"}
+                        </span>
+                    </div>
+                ),
+                size: 140,
+                minSize: 100,
+                maxSize: 200,
+            },
+            {
                 id: "kebutuhan_dana",
                 accessorKey: "kebutuhan_dana",
                 header: ({ column }) => (
@@ -589,6 +619,7 @@ export default function InvestmentTable() {
         setFilterEntitas("all")
         setFilterStatus("all")
         setFilterIssue("all")
+        setFilterStatusIssue("all")
         setGlobalFilter("")
     }
 
@@ -600,7 +631,7 @@ export default function InvestmentTable() {
     }
 
     const hasActiveFilters = filterKlaster !== "all" || filterEntitas !== "all" ||
-        filterStatus !== "all" || filterIssue !== "all" || globalFilter !== ""
+        filterStatus !== "all" || filterIssue !== "all" || filterStatusIssue !== "all" || globalFilter !== ""
 
     if (error) {
         return (
@@ -712,6 +743,18 @@ export default function InvestmentTable() {
                                     <SelectItem value="all">Semua Issue</SelectItem>
                                     {filterOptions.issue.map((i) => (
                                         <SelectItem key={i} value={i}>{i}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select value={filterStatusIssue} onValueChange={setFilterStatusIssue}>
+                                <SelectTrigger className="w-[140px] h-8 text-xs">
+                                    <SelectValue placeholder="Status Issue" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Status Issue</SelectItem>
+                                    {filterOptions.statusIssue.map((si) => (
+                                        <SelectItem key={si} value={si}>{si}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -829,7 +872,7 @@ export default function InvestmentTable() {
                                                                 <TableCell
                                                                     key={`expand-${cell.id}`}
                                                                     style={{ width: cell.column.getSize() }}
-                                                                    className="border-x border-border/50 py-2"
+                                                                    className="border-x border-border/50 py-2 align-top"
                                                                 >
                                                                     {cell.column.id === "project_definition" ? (
                                                                         <div className="flex flex-col gap-2 pl-6">
@@ -851,6 +894,24 @@ export default function InvestmentTable() {
                                                                                 <FileText className="h-4 w-4" />
                                                                                 View Kontrak
                                                                             </Button>
+                                                                        </div>
+                                                                    ) : null}
+                                                                    {cell.column.id === "status_investasi" ? (
+                                                                        <div className="flex flex-col gap-1 items-center text-center px-2">
+                                                                            <span className="text-[10px] uppercase text-muted-foreground font-semibold">Action Target</span>
+                                                                            <span className="text-xs">{row.original.action_target || "-"}</span>
+                                                                        </div>
+                                                                    ) : null}
+                                                                    {cell.column.id === "issue_categories" ? (
+                                                                        <div className="flex flex-col gap-3 px-2">
+                                                                            <div className="flex flex-col gap-1 items-center text-center">
+                                                                                <span className="text-[10px] uppercase text-muted-foreground font-semibold">HO Support</span>
+                                                                                <span className="text-xs">{row.original.head_office_support_desc || "-"}</span>
+                                                                            </div>
+                                                                            <div className="flex flex-col gap-1 items-center text-center">
+                                                                                <span className="text-[10px] uppercase text-muted-foreground font-semibold">PIC</span>
+                                                                                <span className="text-xs">{row.original.pic || "-"}</span>
+                                                                            </div>
                                                                         </div>
                                                                     ) : null}
                                                                 </TableCell>

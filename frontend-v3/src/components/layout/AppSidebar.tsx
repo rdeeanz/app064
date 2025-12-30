@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import {
     LayoutDashboard,
@@ -6,6 +7,12 @@ import {
     LogOut,
     ChevronLeft,
     Menu,
+    ChevronDown,
+    ClipboardList,
+    PieChart,
+    Activity,
+    Briefcase,
+    Monitor,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -20,27 +27,79 @@ interface AppSidebarProps {
     isMobile?: boolean
 }
 
-const navigation = [
+type NavItem = {
+    name: string
+    href?: string
+    icon: React.ElementType
+    children?: {
+        name: string
+        href: string
+        icon?: React.ElementType
+    }[]
+}
+
+const navigation: NavItem[] = [
     {
         name: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
     },
     {
-        name: "Investment Data",
-        href: "/dashboard/invest",
-        icon: TrendingUp,
+        name: "Monitoring",
+        icon: Monitor,
+        children: [
+            {
+                name: "Monitoring Investasi",
+                href: "/dashboard/invest",
+                icon: TrendingUp,
+            },
+            {
+                name: "Monitoring Kontrak",
+                href: "/dashboard/kontrak",
+                icon: FileText,
+            },
+        ],
     },
     {
-        name: "Data Kontrak",
-        href: "/dashboard/kontrak",
-        icon: FileText,
+        name: "Reports",
+        icon: ClipboardList,
+        children: [
+            {
+                name: "Investment Dashboard",
+                href: "/dashboard/investment-dashboard",
+                icon: TrendingUp,
+            },
+            {
+                name: "Investment Overview",
+                href: "/dashboard/investment-overview",
+                icon: PieChart,
+            },
+            {
+                name: "Pekerjaan Investasi",
+                href: "/dashboard/investment-project",
+                icon: Briefcase,
+            },
+            {
+                name: "Lap. Progres Fisik",
+                href: "/dashboard/investment-progress",
+                icon: Activity,
+            },
+        ],
     },
 ]
 
 export function AppSidebar({ isOpen, onToggle, isMobile = false }: AppSidebarProps) {
     const location = useLocation()
     const { user, logout } = useAuth()
+    const [openMenus, setOpenMenus] = useState<string[]>(["Reports"]) // Default open for UX
+
+    const toggleMenu = (name: string) => {
+        setOpenMenus((prev) =>
+            prev.includes(name)
+                ? prev.filter((item) => item !== name)
+                : [...prev, name]
+        )
+    }
 
     return (
         <>
@@ -87,21 +146,90 @@ export function AppSidebar({ isOpen, onToggle, isMobile = false }: AppSidebarPro
                 <ScrollArea className="flex-1 px-2 py-4">
                     <nav className="space-y-1">
                         {navigation.map((item) => {
+                            if (item.children) {
+                                const isOpenMenu = openMenus.includes(item.name)
+                                const isChildActive = item.children.some(child => location.pathname === child.href)
+
+                                if (!isOpen && !isMobile) {
+                                    // Collapsed state logic (icon only)
+                                    return (
+                                        <div key={item.name} className="relative group">
+                                            <Button
+                                                variant="ghost"
+                                                className={cn(
+                                                    "w-full justify-start px-3",
+                                                    isChildActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground"
+                                                )}
+                                                onClick={onToggle} // Expand sidebar on click
+                                            >
+                                                <item.icon className={cn("h-4 w-4", !isOpen && "mr-0")} />
+                                            </Button>
+                                        </div>
+                                    )
+                                }
+
+                                return (
+                                    <div key={item.name} className="space-y-1">
+                                        <button
+                                            onClick={() => toggleMenu(item.name)}
+                                            className={cn(
+                                                "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground",
+                                                isChildActive && "text-primary"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <item.icon className="h-4 w-4" />
+                                                <span>{item.name}</span>
+                                            </div>
+                                            <ChevronDown
+                                                className={cn(
+                                                    "h-4 w-4 transition-transform",
+                                                    isOpenMenu && "rotate-180"
+                                                )}
+                                            />
+                                        </button>
+                                        {isOpenMenu && (
+                                            <div className="ml-4 space-y-1 border-l pl-2">
+                                                {item.children.map((child) => {
+                                                    const isActive = location.pathname === child.href
+                                                    return (
+                                                        <Link
+                                                            key={child.name}
+                                                            to={child.href}
+                                                            onClick={isMobile ? onToggle : undefined}
+                                                            className={cn(
+                                                                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                                                                isActive
+                                                                    ? "bg-sidebar-primary text-sidebar-primary-foreground font-medium"
+                                                                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                                            )}
+                                                        >
+                                                            {child.icon ? <child.icon className="h-3.5 w-3.5" /> : <div className="w-3.5" />}
+                                                            <span>{child.name}</span>
+                                                        </Link>
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                )
+                            }
+
                             const isActive = location.pathname === item.href
                             return (
                                 <Link
                                     key={item.name}
-                                    to={item.href}
+                                    to={item.href!}
                                     onClick={isMobile ? onToggle : undefined}
                                     className={cn(
                                         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                                         isActive
                                             ? "bg-sidebar-primary text-sidebar-primary-foreground"
                                             : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                                        !isOpen && "justify-center"
+                                        !isOpen && !isMobile && "justify-center px-2"
                                     )}
                                 >
-                                    <item.icon className="h-4 w-4 shrink-0" />
+                                    <item.icon className="h-4 w-4" />
                                     {isOpen && <span>{item.name}</span>}
                                 </Link>
                             )

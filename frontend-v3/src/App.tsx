@@ -8,6 +8,9 @@ import InvestmentTable from "@/pages/InvestmentTable"
 import DataKontrak from "@/pages/DataKontrak"
 import KontrakByInvestasi from "@/pages/KontrakByInvestasi"
 import EditInvestasi from "@/pages/EditInvestasi"
+import InvestmentDashboard from "@/pages/InvestmentDashboard"
+import InvestmentProject from "@/pages/InvestmentProject"
+
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading } = useAuth()
@@ -51,6 +54,8 @@ function AppRoutes() {
                 <Route path="invest" element={<InvestmentTable />} />
                 <Route path="invest/:refIdRoot/edit" element={<EditInvestasi />} />
                 <Route path="invest/:idInvestasi/kontrak" element={<KontrakByInvestasi />} />
+                <Route path="investment-dashboard" element={<InvestmentDashboard />} />
+                <Route path="investment-project" element={<InvestmentProject />} />
                 <Route path="kontrak" element={<DataKontrak />} />
             </Route>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
