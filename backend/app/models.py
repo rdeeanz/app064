@@ -145,6 +145,7 @@ class ProjectInvest(Base):
     jangka_waktu = Column(Integer)
     satuan_hari = Column(String(50), default="Hari")
     tanggal_selesai = Column(Date)
+    kontrak_aktif = Column(String(10))
     
     # Location
     latitude = Column(Numeric(10, 7))

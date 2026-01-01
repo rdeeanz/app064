@@ -12,6 +12,13 @@ from .. import crud, schemas
 router = APIRouter(prefix="/projects", tags=["projects"])
 
 
+@router.get("/filter-options", response_model=schemas.FilterOptionsResponse)
+def get_filter_options(db: Session = Depends(get_db)):
+    """
+    Get available filter options from project_invest table.
+    """
+    return crud.get_filter_options(db)
+
 @router.get("", response_model=schemas.ProjectListResponse)
 def list_projects(
     page: int = Query(1, ge=1, description="Page number"),
@@ -59,6 +66,23 @@ def get_statistics(
     Returns total projects, total RKAP, total contract value, and open issues count.
     """
     return crud.get_summary_stats(db, tahun_rkap)
+
+
+
+
+
+@router.get("/invest-projects/{id_investasi:path}", response_model=list[schemas.ProjectResponse])
+def get_projects_by_investment_id(
+    id_investasi: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get all projects by Investment ID.
+    
+    - **id_investasi**: Investment ID
+    """
+    projects = crud.get_projects_by_investasi_id_list(db, id_investasi)
+    return projects
 
 
 @router.get("/{id_root:path}", response_model=schemas.ProjectResponse)

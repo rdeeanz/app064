@@ -74,6 +74,20 @@ SELECT
     COALESCE(agg.sum_real_nov, 0) AS realisasi_november,
     COALESCE(agg.sum_real_des, 0) AS realisasi_desember,
 
+    -- Realisasi Kumulatif (S.D. = Sampai Dengan)
+    COALESCE(agg.sum_real_jan, 0) AS realisasi_sd_januari,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0)) AS realisasi_sd_februari,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0)) AS realisasi_sd_maret,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0)) AS realisasi_sd_april,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0)) AS realisasi_sd_mei,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0) + COALESCE(agg.sum_real_jun, 0)) AS realisasi_sd_juni,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0) + COALESCE(agg.sum_real_jun, 0) + COALESCE(agg.sum_real_jul, 0)) AS realisasi_sd_juli,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0) + COALESCE(agg.sum_real_jun, 0) + COALESCE(agg.sum_real_jul, 0) + COALESCE(agg.sum_real_agu, 0)) AS realisasi_sd_agustus,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0) + COALESCE(agg.sum_real_jun, 0) + COALESCE(agg.sum_real_jul, 0) + COALESCE(agg.sum_real_agu, 0) + COALESCE(agg.sum_real_sep, 0)) AS realisasi_sd_september,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0) + COALESCE(agg.sum_real_jun, 0) + COALESCE(agg.sum_real_jul, 0) + COALESCE(agg.sum_real_agu, 0) + COALESCE(agg.sum_real_sep, 0) + COALESCE(agg.sum_real_okt, 0)) AS realisasi_sd_oktober,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0) + COALESCE(agg.sum_real_jun, 0) + COALESCE(agg.sum_real_jul, 0) + COALESCE(agg.sum_real_agu, 0) + COALESCE(agg.sum_real_sep, 0) + COALESCE(agg.sum_real_okt, 0) + COALESCE(agg.sum_real_nov, 0)) AS realisasi_sd_november,
+    (COALESCE(agg.sum_real_jan, 0) + COALESCE(agg.sum_real_feb, 0) + COALESCE(agg.sum_real_mar, 0) + COALESCE(agg.sum_real_apr, 0) + COALESCE(agg.sum_real_mei, 0) + COALESCE(agg.sum_real_jun, 0) + COALESCE(agg.sum_real_jul, 0) + COALESCE(agg.sum_real_agu, 0) + COALESCE(agg.sum_real_sep, 0) + COALESCE(agg.sum_real_okt, 0) + COALESCE(agg.sum_real_nov, 0) + COALESCE(agg.sum_real_des, 0)) AS realisasi_sd_desember,
+
     -- Prognosa Bulanan
     COALESCE(agg.sum_prog_jan, 0) AS prognosa_januari,
     COALESCE(agg.sum_prog_feb, 0) AS prognosa_februari,

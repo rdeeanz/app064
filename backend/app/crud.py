@@ -86,6 +86,23 @@ def get_project_by_investasi_id(db: Session, id_investasi: str) -> Optional[mode
              .first()
 
 
+def get_projects_by_investasi_id_list(db: Session, id_investasi: str) -> list[models.ProjectInvest]:
+    """
+    Get all projects with a given investment ID.
+    
+    Args:
+        db: Database session
+        id_investasi: Investment ID string
+    
+    Returns:
+        List of Projects
+    """
+    return db.query(models.ProjectInvest)\
+             .filter(models.ProjectInvest.id_investasi == id_investasi)\
+             .order_by(models.ProjectInvest.created_at.desc())\
+             .all()
+
+
 def create_project(db: Session, project: schemas.ProjectCreate) -> models.ProjectInvest:
     """
     Create a new project.
@@ -132,6 +149,34 @@ def update_project(
     db.commit()
     db.refresh(db_project)
     return db_project
+
+
+def get_filter_options(db: Session) -> dict:
+    """
+    Get unique filter options from project_invest table.
+    """
+    tgl_mulai = db.query(models.ProjectInvest.tgl_mulai_kontrak)\
+        .filter(models.ProjectInvest.tgl_mulai_kontrak.isnot(None))\
+        .distinct()\
+        .order_by(models.ProjectInvest.tgl_mulai_kontrak.desc())\
+        .all()
+        
+    tgl_selesai = db.query(models.ProjectInvest.tanggal_selesai)\
+        .filter(models.ProjectInvest.tanggal_selesai.isnot(None))\
+        .distinct()\
+        .order_by(models.ProjectInvest.tanggal_selesai.desc())\
+        .all()
+
+    kontrak_aktif = db.query(models.ProjectInvest.kontrak_aktif)\
+        .distinct()\
+        .order_by(models.ProjectInvest.kontrak_aktif.asc())\
+        .all()
+        
+    return {
+        "tgl_mulai_options": [d[0] for d in tgl_mulai],
+        "tgl_selesai_options": [d[0] for d in tgl_selesai],
+        "kontrak_aktif_options": [d[0] for d in kontrak_aktif if d[0] is not None]
+    }
 
 
 def update_project_progress(

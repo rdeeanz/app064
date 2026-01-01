@@ -111,8 +111,8 @@ export default function KontrakByInvestasi() {
         setError(null)
         try {
             const result = await getProjectsByInvestasi(decodedId)
-            setData(result.items)
-            setTotal(result.total)
+            setData(result)
+            setTotal(result.length)
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to fetch data")
         } finally {

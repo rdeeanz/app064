@@ -104,6 +104,7 @@ class ProjectBase(BaseModel):
     jangka_waktu: Optional[int] = None
     satuan_hari: Optional[str] = Field(default="Hari", max_length=50)
     tanggal_selesai: Optional[date] = None
+    kontrak_aktif: Optional[str] = Field(default=None, max_length=10)
     
     # Location
     latitude: Optional[Decimal] = None
@@ -167,3 +168,10 @@ class ProjectListResponse(BaseModel):
     items: list[ProjectResponse]
     page: int
     page_size: int
+
+
+class FilterOptionsResponse(BaseModel):
+    """Schema for filter options response."""
+    tgl_mulai_options: list[date]
+    tgl_selesai_options: list[date]
+    kontrak_aktif_options: list[Optional[str]]

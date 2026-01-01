@@ -65,20 +65,20 @@ import { useMonitorData } from "@/hooks/useMonitorData"
 import { MonitorInvestData } from "@/lib/api"
 import { formatCurrency } from "@/lib/utils"
 
-// Month mapping for realisasi fields
+// Month mapping for realisasi s.d. (cumulative) fields
 const MONTHS = [
-    { value: "januari", label: "Januari", field: "realisasi_januari" },
-    { value: "februari", label: "Februari", field: "realisasi_februari" },
-    { value: "maret", label: "Maret", field: "realisasi_maret" },
-    { value: "april", label: "April", field: "realisasi_april" },
-    { value: "mei", label: "Mei", field: "realisasi_mei" },
-    { value: "juni", label: "Juni", field: "realisasi_juni" },
-    { value: "juli", label: "Juli", field: "realisasi_juli" },
-    { value: "agustus", label: "Agustus", field: "realisasi_agustus" },
-    { value: "september", label: "September", field: "realisasi_september" },
-    { value: "oktober", label: "Oktober", field: "realisasi_oktober" },
-    { value: "november", label: "November", field: "realisasi_november" },
-    { value: "desember", label: "Desember", field: "realisasi_desember" },
+    { value: "januari", label: "s.d Januari", field: "realisasi_sd_januari" },
+    { value: "februari", label: "s.d Februari", field: "realisasi_sd_februari" },
+    { value: "maret", label: "s.d Maret", field: "realisasi_sd_maret" },
+    { value: "april", label: "s.d April", field: "realisasi_sd_april" },
+    { value: "mei", label: "s.d Mei", field: "realisasi_sd_mei" },
+    { value: "juni", label: "s.d Juni", field: "realisasi_sd_juni" },
+    { value: "juli", label: "s.d Juli", field: "realisasi_sd_juli" },
+    { value: "agustus", label: "s.d Agustus", field: "realisasi_sd_agustus" },
+    { value: "september", label: "s.d September", field: "realisasi_sd_september" },
+    { value: "oktober", label: "s.d Oktober", field: "realisasi_sd_oktober" },
+    { value: "november", label: "s.d November", field: "realisasi_sd_november" },
+    { value: "desember", label: "s.d Desember", field: "realisasi_sd_desember" },
 ] as const
 
 // Get current month index based on Jakarta timezone

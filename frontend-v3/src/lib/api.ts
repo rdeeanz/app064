@@ -88,9 +88,23 @@ export interface MonitorInvestData {
     realisasi_juli: number
     realisasi_agustus: number
     realisasi_september: number
+    kontrak_aktif: string | null
     realisasi_oktober: number
     realisasi_november: number
     realisasi_desember: number
+    // Cumulative realization columns (S.D. = Sampai Dengan)
+    realisasi_sd_januari: number
+    realisasi_sd_februari: number
+    realisasi_sd_maret: number
+    realisasi_sd_april: number
+    realisasi_sd_mei: number
+    realisasi_sd_juni: number
+    realisasi_sd_juli: number
+    realisasi_sd_agustus: number
+    realisasi_sd_september: number
+    realisasi_sd_oktober: number
+    realisasi_sd_november: number
+    realisasi_sd_desember: number
     prognosa_januari: number
     prognosa_februari: number
     prognosa_maret: number
@@ -154,6 +168,7 @@ export interface ProjectData {
     jangka_waktu: number | null
     satuan_hari: string | null
     tanggal_selesai: string | null
+    kontrak_aktif: string | null
     created_at: string | null
     updated_at: string | null
 }
@@ -216,19 +231,18 @@ export async function deleteProject(idRoot: string): Promise<void> {
     await api.delete(`/projects/${encodeURIComponent(idRoot)}`)
 }
 
-export async function getProjectsByInvestasi(idInvestasi: string, page = 1, pageSize = 20): Promise<ProjectListResponse> {
-    // Get all projects and filter by id_investasi on client side
-    // since backend doesn't have id_investasi filter yet
-    const response = await api.get<ProjectListResponse>("/projects", {
-        params: { page: 1, page_size: 100 }
-    })
-    const filtered = response.data.items.filter(
-        item => item.id_investasi === idInvestasi
-    )
-    return {
-        total: filtered.length,
-        items: filtered.slice((page - 1) * pageSize, page * pageSize),
-        page,
-        page_size: pageSize
-    }
+export async function getProjectsByInvestasi(idInvestasi: string): Promise<ProjectData[]> {
+    const response = await api.get<ProjectData[]>(`/projects/invest-projects/${encodeURIComponent(idInvestasi)}`)
+    return response.data
+}
+
+export interface FilterOptionsResponse {
+    tgl_mulai_options: string[];
+    tgl_selesai_options: string[];
+    kontrak_aktif_options: string[];
+}
+
+export async function getFilterOptions(): Promise<FilterOptionsResponse> {
+    const response = await api.get<FilterOptionsResponse>('/projects/filter-options')
+    return response.data
 }
